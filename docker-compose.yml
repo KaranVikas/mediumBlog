@@ -20,7 +20,7 @@ services:
     tty: true
     volumes:
       - ./backend:/app
-    command: bash -c "uvicorn main:app --host 0.0.0.0 --reload"
+    # command: bash -c "uvicorn main:app --host 0.0.0.0 --reload"
 
   db:
     image: postgres:15

@@ -35,7 +35,7 @@ def create_access_token(user_id: str) -> str:
     
     return jwt.encode(
         payload,
-        settings.SECRET_KEY.get_secret_value(),
+        settings.SECRET_KEY.get_secret_value() if settings.SECRET_KEY else None,
         algorithm=settings.ALGORITHM
     )
 

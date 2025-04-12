@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 import uuid
 from sqlalchemy import select, update, delete
@@ -16,7 +17,7 @@ async def get_user_by_username(db: AsyncSession, username: str):
     result = await db.execute(select(UserModel).where(UserModel.username == username))
     return result.scalars().first()
 
-async def create_user(db: AsyncSession, username: str, email: str, password: str, full_name: str = None):
+async def create_user(db: AsyncSession, username: str, email: str, password: str, full_name: Optional[str] = None):
     user = UserModel(
         id=uuid.uuid4(),
         username=username,
@@ -29,7 +30,7 @@ async def create_user(db: AsyncSession, username: str, email: str, password: str
     await db.refresh(user)
     return user
 
-async def create_admin_user(db: AsyncSession, username: str, email: str, password: str, role: str, full_name: str = None):
+async def create_admin_user(db: AsyncSession, username: str, email: str, password: str, role: str, full_name: Optional[str] = None):
     user = UserModel(
         username=username,
         email=email,

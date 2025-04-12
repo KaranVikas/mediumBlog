@@ -6,18 +6,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # Database configuration
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: SecretStr
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
-    POSTGRES_DB: str
+    POSTGRES_USER: Optional[str] = None
+    POSTGRES_PASSWORD: Optional[SecretStr] = None
+    POSTGRES_HOST: Optional[str] = None
+    POSTGRES_PORT: Optional[int] = None
+    POSTGRES_DB: Optional[str] = None
 
     # App configuration
-    DOMAIN: str
-    ENVIRONMENT: str
-    BACKEND_CORS_ORIGINS: List[str]
+    DOMAIN: Optional[str] = None
+    ENVIRONMENT: Optional[str] = None
+    BACKEND_CORS_ORIGINS: List[str] = []
     PROJECT_NAME: str = "Medium blog"
-    SECRET_KEY: SecretStr
+    SECRET_KEY: Optional[SecretStr] = None
     API_PREFIX: str = "/api"
 
     ALGORITHM: str = "HS256"  # Or "RS256" for asymmetric encryption
@@ -25,18 +25,18 @@ class Settings(BaseSettings):
 
     # Computed database URLs
     @property
-    def async_db_url(self) -> str:
+    def async_db_url(self) -> PostgresDsn:
         return self._build_db_url("postgresql+asyncpg")
 
     @property
-    def sync_db_url(self) -> str:
+    def sync_db_url(self) -> PostgresDsn:
         return self._build_db_url("postgresql")
 
-    def _build_db_url(self, driver: str) -> str:
+    def _build_db_url(self, driver: str) -> PostgresDsn:
         return PostgresDsn.build(
             scheme=driver,
             username=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD.get_secret_value(),
+            password=self.POSTGRES_PASSWORD.get_secret_value() if self.POSTGRES_PASSWORD else None,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,

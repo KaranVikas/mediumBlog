@@ -44,13 +44,13 @@ async def login(
     db: AsyncSession = Depends(get_db)
 ):
     user = await get_user_by_username(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password):
+    if not user or not verify_password(form_data.password, str(user.password)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return {
-        "access_token": create_access_token(user.id),
+        "access_token": create_access_token(str(user.id)),
         "token_type": "bearer",
     }

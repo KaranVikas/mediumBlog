@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 from core.settings import settings
 
@@ -20,8 +21,8 @@ class AsyncDatabaseSession:
                 max_overflow=10,
                 pool_timeout=30,
             )
-            self._sessionmaker = sessionmaker(
-                self._engine, expire_on_commit=False, class_=AsyncSession
+            self._sessionmaker = async_sessionmaker(
+                self._engine, expire_on_commit=False
             )
     
     @asynccontextmanager
@@ -29,7 +30,10 @@ class AsyncDatabaseSession:
         """Async context manager that yields a session"""
         if not self._sessionmaker:
             await self.init()
+        if not self._sessionmaker:
+            raise RuntimeError("Sessionmaker is not initialized. Ensure 'init()' is called before using 'get_session'.")
         session = self._sessionmaker()
+        
         try:
             yield session
         finally:
