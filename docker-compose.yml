@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - ./backend:/app
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --reload"
+
+  db:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+volumes:
+  pgdata:
